@@ -1,4 +1,4 @@
-package com.example.ud845Pets;
+package com.example.pets;
 
 import android.content.Context;
 
