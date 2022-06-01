@@ -18,7 +18,6 @@ import android.net.Uri;
          */
         @Override
         public boolean onCreate() {
-            // TODO: Create and initialize a PetDbHelper object to gain access to the pets database.
             mDbHelper = new PetDbHelper(getContext());
             return true;
         }
