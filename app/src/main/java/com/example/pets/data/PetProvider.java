@@ -1,6 +1,10 @@
 package com.example.pets.data;
 
+import static com.example.pets.data.PetContract.CONTENT_AUTHORITY;
+import static com.example.pets.data.PetContract.PATH_PETS;
+
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -195,7 +199,22 @@ import android.util.Log;
          */
         @Override
         public int delete(Uri uri, String selection, String[] selectionArgs) {
-            return 0;
+            // Get writeable database
+            SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+            final int match = sUriMatcher.match(uri);
+            switch (match) {
+                case PETS:
+                    // Delete all rows that match the selection and selection args
+                    return database.delete(PetContract.PetEntry.TABLE_NAME, selection, selectionArgs);
+                case PET_ID:
+                    // Delete a single row given by the ID in the URI
+                    selection = PetContract.PetEntry._ID + "=?";
+                    selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                    return database.delete(PetContract.PetEntry.TABLE_NAME, selection, selectionArgs);
+                default:
+                    throw new IllegalArgumentException("Deletion is not supported for " + uri);
+            }
         }
 
         /**
@@ -203,9 +222,16 @@ import android.util.Log;
          */
         @Override
         public String getType(Uri uri) {
-            return null;
+            final int match = sUriMatcher.match(uri);
+            switch (match) {
+                case PETS:
+                    return PetContract.PetEntry.CONTENT_LIST_TYPE;
+                case PET_ID:
+                    return PetContract.PetEntry.CONTENT_ITEM_TYPE;
+                default:
+                    throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
+            }
         }
-
         /** URI matcher code for the content URI for the pets table */
         private static final int PETS = 100;
 
@@ -226,7 +252,7 @@ import android.util.Log;
             // when a match is found.
 
             // TODO: Add 2 content URIs to URI matcher
-            sUriMatcher.addURI(PetContract.CONTENT_AUTHORITY,PetContract.PATH_PETS, PETS);
-            sUriMatcher.addURI(PetContract.CONTENT_AUTHORITY, PetContract.PATH_PETS + "/#", PET_ID);
+            sUriMatcher.addURI(CONTENT_AUTHORITY, PATH_PETS, PETS);
+            sUriMatcher.addURI(CONTENT_AUTHORITY, PATH_PETS + "/#", PET_ID);
         }
     }
