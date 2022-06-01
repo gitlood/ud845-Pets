@@ -4,7 +4,6 @@ import static com.example.pets.data.PetContract.CONTENT_AUTHORITY;
 import static com.example.pets.data.PetContract.PATH_PETS;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -81,12 +80,11 @@ import android.util.Log;
         @Override
         public Uri insert(Uri uri, ContentValues contentValues) {
             final int match = sUriMatcher.match(uri);
-            switch (match) {
-                case PETS:
-                    return insertPet(uri, contentValues);
-                default:
-                    throw new IllegalArgumentException("Insertion is not supported for " + uri);
+            //use switch if more then 2 options
+            if (match == PETS) {
+                return insertPet(uri, contentValues);
             }
+            throw new IllegalArgumentException("Insertion is not supported for " + uri);
         }
 
         /**
